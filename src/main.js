@@ -14,3 +14,5 @@
       <p>Текст</p>
   </li>
 */
+import './js/tasks'
+
