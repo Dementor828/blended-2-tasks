@@ -3,16 +3,7 @@ import { getItem, RAW_FORM_DATA_OBJECT, TASKS_LIST_ARR, removeItem, setItem } fr
 import { nanoid } from 'nanoid'
 import { createItem, mapItems } from "./markup-tasks";
 
-document.addEventListener('DOMContentLoaded', function (e) {
-    const savedToLocalStorage = getItem(RAW_FORM_DATA_OBJECT)
-    refs.addItemForm.elements.taskName.value = savedToLocalStorage?.title ? savedToLocalStorage.title : ''
-    refs.addItemForm.elements.taskDescription.value = savedToLocalStorage?.description ? savedToLocalStorage.description : ''
 
-    const itemListFromLocalStorage = getItem(TASKS_LIST_ARR) ?? []
-
-    const markup = mapItems(itemListFromLocalStorage)
-    refs.itemList.innerHTML = markup
-})
 
 refs.addItemForm.addEventListener('input', function (e) {
     const rawFormData = extractFormData(e)
@@ -28,9 +19,9 @@ refs.addItemForm.addEventListener('submit', function (e) {
     }
     
     const submitObject = {
-        id: nanoid(),
-        title: rawFormData.title,
-        description: rawFormData.description
+        id: nanoid().trim(),
+        title: rawFormData.title.trim(),
+        description: rawFormData.description.trim()
     }
     const markup = createItem(submitObject)
     
@@ -48,8 +39,23 @@ function extractFormData (e) {
     const formData = new FormData(e.currentTarget)
     
     const rawFormData = {
-        title: formData.get('taskName'),
-        description: formData.get('taskDescription'),
+        title: formData.get('taskName').trim(),
+        description: formData.get('taskDescription').trim(),
     }
     return rawFormData;
 }
+
+refs.itemList.addEventListener('click', function (e) {
+    if(!e.target.classList.contains('task-list-item-btn')) return;
+
+    const liItem = e.target.closest('.task-list-item')
+    
+    const liId = liItem.dataset.itemId;
+    
+    const itemListFromLocalStorage = getItem(TASKS_LIST_ARR) ?? []
+    const newList = itemListFromLocalStorage.filter(item => item.id !== liId)
+
+    setItem(TASKS_LIST_ARR, [...newList])
+    
+    liItem.remove()
+})

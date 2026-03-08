@@ -14,5 +14,31 @@
       <p>Текст</p>
   </li>
 */
+import { CURRENT_THEME, getItem, RAW_FORM_DATA_OBJECT, TASKS_LIST_ARR } from './js/local-storage-api'
+import { mapItems } from './js/markup-tasks'
+import refs from './js/refs'
 import './js/tasks'
+import './js/theme-switcher'
+
+
+document.addEventListener('DOMContentLoaded', function (e) {
+  const savedToLocalStorage = getItem(RAW_FORM_DATA_OBJECT)
+  refs.addItemForm.elements.taskName.value = savedToLocalStorage?.title ? savedToLocalStorage.title.trim() : ''
+  refs.addItemForm.elements.taskDescription.value = savedToLocalStorage?.description ? savedToLocalStorage.description.trim() : ''
+
+  const itemListFromLocalStorage = getItem(TASKS_LIST_ARR) ?? []
+
+  const markup = mapItems(itemListFromLocalStorage)
+  refs.itemList.innerHTML = markup
+
+  const bodyClasses = refs.body.classList
+  
+  const themeColor = getItem(CURRENT_THEME) ?? 'theme-dark'
+  
+  if (bodyClasses.contains('theme-dark')) {
+    bodyClasses.replace('theme-dark', themeColor)
+  } else {
+    bodyClasses.replace('theme-light', themeColor)
+  }
+})
 
